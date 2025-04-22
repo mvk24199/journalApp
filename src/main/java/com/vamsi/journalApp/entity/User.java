@@ -1,6 +1,5 @@
 package com.vamsi.journalApp.entity;
 
-import jdk.jfr.DataAmount;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "users")
-public class UserEntry {
+public class User {
     @Id
     private ObjectId id;
     @Indexed(unique = true)
@@ -28,6 +26,6 @@ public class UserEntry {
     private String password;
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();
-
+    private List<String> roles;
 
 }
