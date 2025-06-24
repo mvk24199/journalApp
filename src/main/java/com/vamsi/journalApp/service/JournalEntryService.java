@@ -5,9 +5,12 @@ import com.vamsi.journalApp.entity.JournalEntry;
 import com.vamsi.journalApp.entity.User;
 import com.vamsi.journalApp.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +22,8 @@ public class JournalEntryService {
     private JournalEntryRepository journalEntryRepository;
     @Autowired
     private UserEntryService userEntryService;
+
+    private static final Logger logger = LoggerFactory.getLogger(JournalEntryService.class);
     public void saveEntry(JournalEntry journalEntry,String username){
         try{
             User current = userEntryService.findByUsername(username);
@@ -27,6 +32,7 @@ public class JournalEntryService {
             current.getJournalEntries().add(saved);
             userEntryService.saveEntry(current);
         }catch(Exception e){
+            logger.info("Exception: "+e);
             System.out.println(e);
             throw new RuntimeException("An error occurred while saving the journal");
         }
@@ -39,11 +45,18 @@ public class JournalEntryService {
         User user = userEntryService.findByUsername(username);
         return journalEntryRepository.findById(id).orElse(null);
     }
+    @Transactional
     public void deleteById(ObjectId id,String username){
         User user = userEntryService.findByUsername(username);
-        user.getJournalEntries().removeIf(x->x.getId().equals(id));
-        userEntryService.saveEntry(user);
-        journalEntryRepository.deleteById(id);
+        boolean removed = user.getJournalEntries().removeIf(x ->
+                x.getId().toHexString().equals(id.toHexString())
+        );
+        if (removed) {
+            userEntryService.saveEntry(user);
+            journalEntryRepository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("Journal entry not found for given ID");
+        }
     }
 
     public void saveEntry(JournalEntry old) {

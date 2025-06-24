@@ -21,7 +21,6 @@ public class UserEntryService {
     }
     public void saveNewUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("USER"));
         userEntryRepository.save(user);
     }
     public List<User> getAllUsers(){
@@ -33,5 +32,11 @@ public class UserEntryService {
     public void deleteById(ObjectId id){userEntryRepository.deleteById(id);}
     public User findByUsername(String username){
         return userEntryRepository.findByUsername(username);
+    }
+
+    public void saveAdmin(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(List.of("ADMIN"));
+        userEntryRepository.save(user);
     }
 }

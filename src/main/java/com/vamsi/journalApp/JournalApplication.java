@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootApplication
 @Transactional
 public class  JournalApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(JournalApplication.class, args);
 	}
